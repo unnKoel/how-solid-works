@@ -53,7 +53,8 @@ const createEffect = (func) => {
     dependencies: new Set(),
   }
 
-  effect.execute() // effect fist run should be scheduled after Dom creation, so don't put it here
+  // effect fist run should be scheduled after Dom creation, so don't put it here
+  effect.execute()
 }
 
 const createMemo = (func) => {
