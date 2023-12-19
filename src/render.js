@@ -1,5 +1,10 @@
-// using hyperscript approach to render that runs from bottom to up.
-// how to identify dynamic contents which should be tracked
+/** 
+ - using hyperscript approach to render that runs from bottom to up.
+ - how to identify dynamic expression which should be tracked, 
+    all dynamic expression are wrapped in functions without parameters that's 
+    used to distinguish with event functions, as each event function has event
+    object passed in.
+ */
 
 const passinProps = (element, props = {}) => {
   for (const propKey in props) {

@@ -36,7 +36,8 @@ describe('pure static DOM rendering', () => {
       cleanUpHtmlFormat(
         `<div class="static" style="color: blue">
           <span class="inner-text">Fri Dec 01 2023 00:00:00 GMT+0800 (China Standard Time)</span>
-         </div>`
+         </div>
+        `
       )
     )
   })
