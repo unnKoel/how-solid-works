@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import h from '../src/render'
+import h from '../src/hyper-js'
 
 const insertBody = (dom) => {
   document.body.appendChild(dom)
