@@ -65,4 +65,10 @@ const createMemo = (func) => {
   return derivedValue
 }
 
-export { createSignal, createEffect, createMemo }
+const untrack = (func) => {
+  if (func.result) return func.result
+  func.result = func()
+  return func.result
+}
+
+export { createSignal, createEffect, createMemo, untrack }

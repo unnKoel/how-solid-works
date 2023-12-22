@@ -16,7 +16,7 @@ beforeEach(() => {
   document.body.innerHTML = ''
 })
 
-describe('pure static DOM rendering', () => {
+describe('static DOM rendering', () => {
   test('a simple element', () => {
     const dom = h('div', { class: 'static', style: 'color: blue' }, 'hello solid')
     insertBody(dom)
@@ -92,4 +92,8 @@ describe('pure static DOM rendering', () => {
       )
     )
   })
+})
+
+describe('dynamic DOM rendering', () => {
+  
 })
