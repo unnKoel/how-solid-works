@@ -69,6 +69,12 @@ Explore how solid works behind the scenes.
 
   What we are able to do is including a new API called untrack to solve this issue mentioned above that's what the `createComponent` API does, inside which, `untrack` is called to wrap component function to make it escape the tracking scope.
 
+- Why do we need a root function in reactive system?
+
+- If effect has dependencies on outside of effect, how can we clean those reference up?
+
+- If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accept. How to resolve this problem?
+
 ## Reference
 
 - [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
