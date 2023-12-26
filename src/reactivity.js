@@ -30,7 +30,7 @@ const createSignal = (value) => {
   return [read, write]
 }
 
-const cleanDependencies = (running) => {
+const cleanup = (running) => {
   for (const sub of running.dependencies) {
     sub.delete(running)
   }
@@ -41,7 +41,7 @@ const cleanDependencies = (running) => {
 const createEffect = (func) => {
   const effect = {
     execute: () => {
-      cleanDependencies(effect)
+      cleanup(effect)
       context.push(effect)
       try {
         func()
@@ -53,7 +53,7 @@ const createEffect = (func) => {
     dependencies: new Set(),
   }
 
-  // effect fist run should be scheduled after Dom creation, so don't put it here
+  // Effect should be scheduled to run after Dom creation, so don't put it here
   effect.execute()
 }
 

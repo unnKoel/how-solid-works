@@ -73,8 +73,16 @@ Explore how solid works behind the scenes.
 
 - If effect has dependencies on outside of effect, how can we clean those reference up?
 
+  `cleanup` disposal way should be involved which is used to do something cleanning up like invoking `removeEventListener` to unbind an event to avoid memory leak, ect. This `cleanup` function will run before each effect start to run, but after rendering, check out this [example](https://playground.solidjs.com/anonymous/8ecb4064-5d3d-4345-b031-38008da113b3) which proves the running order among `rendering`, `cleanup` and `effect`.
+
+  Its implementation seems to be like that `cleanup` function links to the responding `effect` which gets out of execution context(which is really a stack behind) when `cleanup` is running. At the stage of clean before executing effect, check if current-runing effect has a cleanup function. if it is, then execute cleanup function to clean outside dependencies. The execution of `effect` should be set a parameter called `isChange` which expresses if effect runs due to signal change. `cleanup` only runs under condition of signal change which means update. For initial case, cleanup doesn't need to run.
+
+  The last extramely important thing need to do is how to warrant `effect` runs after dom creation. Behind the scene, the reality is that non-dom-creation `effect` runs after dom-creation `effect`. what we need to do seems to be simply filter dom-creation `effect` out and make them run first in the loop of effect execution. for update phase, it works as be. But, for initial phase, we first put all effects into a array for collection which would run once dom template creation stage complete.
+
 - If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accept. How to resolve this problem?
 
 ## Reference
 
 - [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
+
+- [How to detect element being added/removed from dom element?](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element)
