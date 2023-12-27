@@ -69,6 +69,8 @@ Explore how solid works behind the scenes.
 
   What we are able to do is including a new API called untrack to solve this issue mentioned above that's what the `createComponent` API does, inside which, `untrack` is called to wrap component function to make it escape the tracking scope.
 
+  Reference to `Reactive Isolation` section of this blog [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
+
 - Why do we need a root function in reactive system?
 
   The observer pattern as used by these reactive libraries has the potential to produce memory leak. computations that subscribe to signals that out live them are never released as long as the signal is still in use. 
@@ -77,9 +79,13 @@ Explore how solid works behind the scenes.
 
   What we need to do is to collect all effect references in global scope and try to invoke those cleanups of all effects in the right time to avoid memory leak and keepking old Dom references in closures.
 
+  Refer to the [implementation of root](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts#L38) in mobx-jsx and the downside of observer pattern, Reactive Roots section in this blog [SolidJS: Reactivity to Rendering](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element), as well as [render implementation]((https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/client.js#L48)) in dom-expression.
+
 - If effect has dependencies on outside of effect, how can we clean those reference up?
 
-  `cleanup` disposal way should be involved which is used to do something cleanning up like invoking `removeEventListener` to unbind an event to avoid memory leak, ect. This `cleanup` function will run before each effect start to run, but after rendering, check out this [example](https://playground.solidjs.com/anonymous/8ecb4064-5d3d-4345-b031-38008da113b3) which proves the running order among `rendering`, `cleanup` and `effect`.
+  `cleanup` disposal way should be involved which is used to do something cleanning up like invoking `removeEventListener` to unbind an event to avoid memory leak, ect. more detail reason as [cleaning up stale side effects](https://github.com/adamhaile/S?tab=readme-ov-file#cleaning-up-stale-side-effects)
+  
+  This `cleanup` function will run before each effect start to run, but after rendering, check out this [example](https://playground.solidjs.com/anonymous/8ecb4064-5d3d-4345-b031-38008da113b3) which proves the running order among `rendering`, `cleanup` and `effect`.
 
   Its implementation seems to be like that `cleanup` function links to the responding `effect` which gets out of execution context(which is really a stack behind) when `cleanup` is running. At the stage of clean before executing effect, check if current-runing effect has a cleanup function. if it is, then execute cleanup function to clean outside dependencies. The execution of `effect` should be set a parameter called `isChange` which expresses if effect runs due to signal change. `cleanup` only runs under condition of signal change which means update. For initial case, cleanup doesn't need to run.
 
@@ -92,3 +98,5 @@ Explore how solid works behind the scenes.
 - [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
 
 - [How to detect element being added/removed from dom element?](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element)
+
+- [mobx-jsx](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts)
