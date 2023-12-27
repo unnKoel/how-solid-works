@@ -6,16 +6,19 @@ Explore how solid works behind the scenes.
 
 - Reactivity
 
-  - createSignal
-  - createEffect
-  - createMemo
-  - untrack
+  - ✅ createSignal
+  - ✅ createEffect
+  - ✅ createMemo
+  - ✅ untrack
+  - ✅ root
+  - ✅ onCleanup
+  - batch
 
 - Rendering
-  - createComponent
-  - dynamicPropery(convert the access of prop from invoking to the way of property access).
-  - insert (link child nodes to parent node)
-  - assign (static attributes)
+  - ✅ createComponent
+  - ✅ dynamicPropery(convert the access of prop from invoking to the way of property access).
+  - ✅ insert (link child nodes to parent node)
+  - ✅ assign (static attributes)
 
 ## Q&A
 
@@ -73,25 +76,25 @@ Explore how solid works behind the scenes.
 
 - Why do we need a root function in reactive system?
 
-  The observer pattern as used by these reactive libraries has the potential to produce memory leak. computations that subscribe to signals that out live them are never released as long as the signal is still in use. 
-  
+  The observer pattern as used by these reactive libraries has the potential to produce memory leak. computations that subscribe to signals that out live them are never released as long as the signal is still in use.
+
   This also has the downside of keeping old Dom references in closures when it comes to Dom side effects.
 
   What we need to do is to collect all effect references in global scope and try to invoke those cleanups of all effects in the right time to avoid memory leak and keepking old Dom references in closures.
 
-  Refer to the [implementation of root](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts#L38) in mobx-jsx and the downside of observer pattern, Reactive Roots section in this blog [SolidJS: Reactivity to Rendering](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element), as well as [render implementation]((https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/client.js#L48)) in dom-expression.
+  Refer to the [implementation of root](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts#L38) in mobx-jsx and the downside of observer pattern, Reactive Roots section in this blog [SolidJS: Reactivity to Rendering](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element), as well as [render implementation](<(https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/client.js#L48)>) in dom-expression.
 
 - If effect has dependencies on outside of effect, how can we clean those reference up?
 
   `cleanup` disposal way should be involved which is used to do something cleanning up like invoking `removeEventListener` to unbind an event to avoid memory leak, ect. more detail reason as [cleaning up stale side effects](https://github.com/adamhaile/S?tab=readme-ov-file#cleaning-up-stale-side-effects)
-  
+
   This `cleanup` function will run before each effect start to run, but after rendering, check out this [example](https://playground.solidjs.com/anonymous/8ecb4064-5d3d-4345-b031-38008da113b3) which proves the running order among `rendering`, `cleanup` and `effect`.
 
   Its implementation seems to be like that `cleanup` function links to the responding `effect` which gets out of execution context(which is really a stack behind) when `cleanup` is running. At the stage of clean before executing effect, check if current-runing effect has a cleanup function. if it is, then execute cleanup function to clean outside dependencies. The execution of `effect` should be set a parameter called `isChange` which expresses if effect runs due to signal change. `cleanup` only runs under condition of signal change which means update. For initial case, cleanup doesn't need to run.
 
   The last extramely important thing need to do is how to warrant `effect` runs after dom creation. Behind the scene, the reality is that non-dom-creation `effect` runs after dom-creation `effect`. what we need to do seems to be simply filter dom-creation `effect` out and make them run first in the loop of effect execution. for update phase, it works as be. But, for initial phase, we first put all effects into a array for collection which would run once dom template creation stage complete.
 
-- If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accept. How to resolve this problem?
+- If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accepted. How to resolve this problem?
 
 ## Reference
 

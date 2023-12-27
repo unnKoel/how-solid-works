@@ -5,7 +5,7 @@
     used to distinguish with event functions, as each event function has event
     object passed in.
  */
-import { createEffect } from './reactivity'
+import { createEffect, untracked } from './reactivity'
 
 const dynamicProperty = (props, key) => {
   const value = props[key]
@@ -56,6 +56,10 @@ const getProps = (args) => {
   return props
 }
 
+const createComponent = (component, props) => {
+  return untracked(() => component(props))
+}
+
 const h = (...args) => {
   let element = null
 
@@ -104,7 +108,7 @@ const h = (...args) => {
           }
         }
 
-        element = l(props)
+        element = createComponent(l, props)
       } else {
         insert(element, l)
       }

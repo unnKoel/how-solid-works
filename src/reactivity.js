@@ -1,9 +1,11 @@
 // create fundamental reactivity primitives as createSignal, createEffect, and createMemo
 import Stack from './stack'
 
-const context = Stack()
+const emptyContext = Stack()
+let context = Stack()
+const effects = new Set()
 
-const createSignal = (value) => {
+export const createSignal = (value) => {
   const subscriptions = new Set()
 
   const read = () => {
@@ -31,6 +33,8 @@ const createSignal = (value) => {
 }
 
 const cleanup = (running) => {
+  if (running.onCleanup) running.onCleanup()
+
   for (const sub of running.dependencies) {
     sub.delete(running)
   }
@@ -38,7 +42,24 @@ const cleanup = (running) => {
   running.dependencies.clear()
 }
 
-const createEffect = (func) => {
+export const root = (fn) => {
+  const ret = untracked(() =>
+    fn(function dispose() {
+      for (const effect of effects) {
+        cleanup(effect)
+      }
+    })
+  )
+
+  return ret
+}
+
+export const onCleanup = (func) => {
+  const running = context.peek()
+  if (running) running.onCleanup = func
+}
+
+export const createEffect = (func) => {
   const effect = {
     execute: () => {
       cleanup(effect)
@@ -53,11 +74,10 @@ const createEffect = (func) => {
     dependencies: new Set(),
   }
 
-  // Effect should be scheduled to run after Dom creation, so don't put it here
-  effect.execute()
+  effects.add(effect)
 }
 
-const createMemo = (func) => {
+export const createMemo = (func) => {
   const [derivedValue, setDerivedValue] = createSignal()
 
   createEffect(() => setDerivedValue(func()))
@@ -65,10 +85,12 @@ const createMemo = (func) => {
   return derivedValue
 }
 
-const untrack = (func) => {
-  if (func.result) return func.result
-  func.result = func()
-  return func.result
+export const untracked = (fn) => {
+  const oldContext = context
+  context = emptyContext
+  try {
+    return fn()
+  } finally {
+    context = oldContext
+  }
 }
-
-export { createSignal, createEffect, createMemo, untrack }
