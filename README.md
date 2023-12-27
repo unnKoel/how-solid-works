@@ -71,6 +71,12 @@ Explore how solid works behind the scenes.
 
 - Why do we need a root function in reactive system?
 
+  The observer pattern as used by these reactive libraries has the potential to produce memory leak. computations that subscribe to signals that out live them are never released as long as the signal is still in use. 
+  
+  This also has the downside of keeping old Dom references in closures when it comes to Dom side effects.
+
+  What we need to do is to collect all effect references in global scope and try to invoke those cleanups of all effects in the right time to avoid memory leak and keepking old Dom references in closures.
+
 - If effect has dependencies on outside of effect, how can we clean those reference up?
 
   `cleanup` disposal way should be involved which is used to do something cleanning up like invoking `removeEventListener` to unbind an event to avoid memory leak, ect. This `cleanup` function will run before each effect start to run, but after rendering, check out this [example](https://playground.solidjs.com/anonymous/8ecb4064-5d3d-4345-b031-38008da113b3) which proves the running order among `rendering`, `cleanup` and `effect`.
