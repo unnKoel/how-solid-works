@@ -94,6 +94,8 @@ Explore how solid works behind the scenes.
 
   The last extramely important thing need to do is how to warrant `effect` runs after dom creation. Behind the scene, the reality is that non-dom-creation `effect` runs after dom-creation `effect`. what we need to do seems to be simply filter dom-creation `effect` out and make them run first in the loop of effect execution. for update phase, it works as be. But, for initial phase, we first put all effects into a array for collection which would run once dom template creation stage complete.
 
+  Another approach about how to warrant `effect` runs after dom creation is making two version of `creactEffect` API, one of them is normal like building effects with signal, another has the same functionality but additional put the whole into an micro task, so that every effect which uses the latter would runs after those using the former.
+
 - If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accepted. How to resolve this problem?
 
 ## Reference
