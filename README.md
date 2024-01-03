@@ -22,7 +22,7 @@ Explore how solid works behind the scenes.
 
 ## Q&A
 
-- what can we do to avoid the component being invoked in reaction ?
+- What can we do to avoid the component being invoked in reaction?
 
   Component just has the responsibility to wrap one piece of dom creation which would be involved in tracked block sometimes. When reaction conducts, this component function would be invoked that's unnecessary, even that violates the principle of fine-grained tracking tech.
 
@@ -98,7 +98,7 @@ Explore how solid works behind the scenes.
 
 - If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accepted. How to resolve this problem?
 
-- what if condition exists in dom expression?
+- What if condition exists in dom expression?
 
   In this case, if a part of dom needs to hide when condition is not satisfied, disposal work should be exectuted in each child component. how to find out disposal functions for all of child component, as Solid hasn't component tree to maintain.
 
@@ -107,6 +107,8 @@ Explore how solid works behind the scenes.
   Another use is
 
   > useContext obtains context by walking up the owner tree to find the nearest ancestor providing the desired context. So without an owner you cannot look up any provided context
+
+- Does each render path end at the Dom, so Dom lifecycle determines lifecycles of signals, computations related?
 
 ## Reference
 
