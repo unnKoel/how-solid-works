@@ -98,6 +98,16 @@ Explore how solid works behind the scenes.
 
 - If an effect is expensive dom operation that depends on multiple signals. When two signals among changes in the meantime, then the dom operation would run twice, that couldn't be accepted. How to resolve this problem?
 
+- what if condition exists in dom expression?
+
+  In this case, if a part of dom needs to hide when condition is not satisfied, disposal work should be exectuted in each child component. how to find out disposal functions for all of child component, as Solid hasn't component tree to maintain.
+
+  Solid expands surrounding computation, as computation always lives because of linking to Dom in the end. So it seems to create an new concept called ower linking to computation. owers are cascaded like a component tree, but it only serves to maintain the trace of computations to figure out those corresponding disposals.
+
+  Another use is
+
+  > useContext obtains context by walking up the owner tree to find the nearest ancestor providing the desired context. So without an owner you cannot look up any provided context
+
 ## Reference
 
 - [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
