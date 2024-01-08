@@ -110,10 +110,22 @@ Explore how solid works behind the scenes.
 
 - Does each render path end at the Dom, so Dom lifecycle determines lifecycles of signals, computations related?
 
+- Why giving up component tree instead of applying owner tree?
+
+  Build owner tree based on reactive execution path and after-execution cleanup path which is from pragmatic perspective of framework at a low level, keeping it agnostic for the upper level is a good design principle. that means a pure reactive system should keep it simple and pure, Don't let concepts or semantic from user penetrate in. By this way, this type of reactive system is independent and better to reuse in more cases.
+ 
+  Instead, component tree is built depending on the clear UI semantic defined by user. 
+
+  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what react has done.
+
 ## Reference
+
+- [A Hands-on Introduction to Fine-Grained Reactivity](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)
 
 - [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
 
 - [How to detect element being added/removed from dom element?](https://stackoverflow.com/questions/20156453/how-to-detect-element-being-added-removed-from-dom-element)
 
 - [mobx-jsx](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts)
+
+- [solid](https://github.com/solidjs/solid)
