@@ -116,13 +116,15 @@ Explore how solid works behind the scenes.
 
   Instead, component tree is built depending on the clear UI semantic defined by user.
 
-  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what react has done.
+  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what React has done. So reactive mode of React is just the special case of fine-grained reative. 
 
 - how does the context implement?
 
   Before I suppose that context could be fulfilled using stack, because the top of stack is the place where providers store. That's true, however we have already the owner or component tree. any one of branch of that tree could work as a stack, so it's unnecessary to involve another stack, simply put providers created on each corresponding owner or component node. For betterment, avoiding search up till end of that owner or component tree, using providers from parent node override nodes with same type in the child node is a high performant way, as `useContext` always pick the latest one.
 
 - what is Trasition? what problem does it solve? How to implement it?
+
+- how about suspense, lazy, createResource?
 
 ## Reference
 
