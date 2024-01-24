@@ -122,9 +122,52 @@ Explore how solid works behind the scenes.
 
   Before I suppose that context could be fulfilled using stack, because the top of stack is the place where providers store. That's true, however we have already the owner or component tree. any one of branch of that tree could work as a stack, so it's unnecessary to involve another stack, simply put providers created on each corresponding owner or component node. For betterment, avoiding search up till end of that owner or component tree, using providers from parent node override nodes with same type in the child node is a high performant way, as `useContext` always pick the latest one.
 
+- what do internal functions as `runTop` and `lookUpstream` ready do?
+
+  Reaction happends like propagation from center point(Signal) to computation edges. but if adopting a way like invoking observers on every computation owner, then couldn't ensure the update order which is based on dependencies. There are two types of dependencies, subscription between computation and parent-child computation. So first it has to find out the root computation(marked as stale) which is the start point of this update path depending on dependency trace, and then run it to tirgger the whole update chain. other computations in the update chain that are derived nodes are marked as pending. 
+
+  When running the root computation, it must find out all ancestor computations through parent-child computation dependencies, and then run them from top to bottom invoking order to reevaluate all computations.
+
+  Subscription between computation is created by `createMemo` in general, as below
+  ```js
+    [a1, setA1] = createSignal(false),
+    b1 = createMemo(
+      () => {
+        a1();
+      },
+      undefined,
+      { equals: false }
+    ),
+    b2 = createMemo(
+      () => {
+        b1();
+      },
+      undefined,
+      { equals: false }
+    ),
+  ```
+
+  Parent-child computation is created by nested invokation of `createMemo` or `createEffect`
+  ```js
+    createRoot(() => {
+      const [s1, set1] = createSignal(1);
+      const [s2, set2] = createSignal(2);
+      let c1: () => number;
+      createEffect(() => {
+        const value = s2() + 3
+        createMemo(() => {
+          c1 = createMemo(() => s1());
+          return c1 + value
+        }); 
+      })  
+    });
+  ```
+
 - what is trasition? what problem does it solve? How to implement it?
 
 - how about suspense, lazy, createResource?
+
+- catchError and <ErrorBoundary\>
 
 ## Reference
 
