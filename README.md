@@ -118,11 +118,11 @@ Explore how solid works behind the scenes.
 
   Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what React has done. So reactive mode of React is just the special case of fine-grained reative. 
 
-- how does the context implement?
+- How does the context implement?
 
   Before I suppose that context could be fulfilled using stack, because the top of stack is the place where providers store. That's true, however we have already the owner or component tree. any one of branch of that tree could work as a stack, so it's unnecessary to involve another stack, simply put providers created on each corresponding owner or component node. For betterment, avoiding search up till end of that owner or component tree, using providers from parent node override nodes with same type in the child node is a high performant way, as `useContext` always pick the latest one.
 
-- what do internal functions as `runTop` and `lookUpstream` ready do?
+- What do internal functions as `runTop` and `lookUpstream` ready do?
 
   Reaction happends like propagation from center point(Signal) to computation edges. but if adopting a way like invoking observers on every computation owner, then couldn't ensure the update order which is based on dependencies. There are two types of dependencies, subscription between computation and parent-child computation. So first it has to find out the root computation(marked as stale) which is the start point of this update path depending on dependency trace, and then run it to tirgger the whole update chain. other computations in the update chain that are derived nodes are marked as pending. 
 
@@ -163,11 +163,21 @@ Explore how solid works behind the scenes.
     });
   ```
 
-- what is trasition? what problem does it solve? How to implement it?
+- What is trasition? what problem does it solve? how to implement it?
 
-- how about suspense, lazy, createResource?
+- How about <Suspense\>, lazy, createResource?
 
-- catchError and <ErrorBoundary\>
+  <Suspense/> works upon Context as well as the same with <ErrorBoundary\>. When any async request from outside completes, then get and invoke the function of showing children of `Suspense` component from the nearest owner which is created by `Suspense` component.
+
+  But `Suspense` collects all status of async requests, Only when all of them are resolved, children elements show. One approach is counting the number of pending requests, it decreases as long as they are resolved till that number is zero that's the time of showing children.
+
+- CatchError and <ErrorBoundary\>
+  
+  `ErrorBoundary` is a declarative expression to define the way of error handler, however `catchError` is a imperative way. ErrorBoundary is implemented based on the context, where there is a built-in specific context called something like ErrorContext which puts the function of showing error view in the nearest owner that's newly created by `ErrorBoundary`. When any error happends under that owner scope, getting that function from nearest owner and invoke it to show error view.
+
+  What the function of showing error view looks like is that appending elemens associated with error view into the root element to replace children of `ErrorBoundary` component.
+
+  `catchError` offers a imperative way to set error handler into the error context upstream. Use case of it is like that report error to server side. `ErrorBoundary` is generally used to provide a view for error case on client side.
 
 ## Reference
 
