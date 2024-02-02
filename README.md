@@ -167,9 +167,12 @@ Explore how solid works behind the scenes.
 
 - How about <Suspense\>, lazy, createResource?
 
-  <Suspense/> works upon Context as well as the same with <ErrorBoundary\>. When any async request from outside completes, then get and invoke the function of showing children of `Suspense` component from the nearest owner which is created by `Suspense` component.
+  <Suspense\> works upon Context as well as the same with <ErrorBoundary\>. When any async request from outside completes, then get and invoke the function of showing children of `Suspense` component from the nearest owner which is created by `Suspense` component.
 
   But `Suspense` collects all status of async requests, Only when all of them are resolved, children elements show. One approach is counting the number of pending requests, it decreases as long as they are resolved till that number is zero that's the time of showing children.
+
+  `lazy` return a component function which internally news a signal to get the asnyc component from promise when resolved, then create a derived state using `createMemo` to invoke component passed in props related to get the final root element of component created which is wrapped in a function to be returned in order to make appending that root element of component into parent element is reactive, because it would be wrapped by `createdEffect` automatically in rendering process as it's a function.
+  So the whole reactive track path is generated, once component is resolved and set component into signal, this will trigger the subsequential track path, ending with appending that component into DOM tree.
 
 - CatchError and <ErrorBoundary\>
   
