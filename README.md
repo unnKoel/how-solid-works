@@ -163,11 +163,15 @@ Explore how solid works behind the scenes.
     });
   ```
 
-- What is trasition? what problem does it solve? how to implement it?
+- What is transition? what problem does it solve? how to implement it?
+
+  what transition does is that waiting all promises are resolved, then submit all commits. so transition need to collect all promises, and run computation map in a temporary template as well, hydrate back to the real computation map once all promises finish.
+  
+  but we couldn't always wait those promises finished, so async reschedule should be involved to avoid blocking the main thread. 
 
 - How about <Suspense\>, lazy, createResource?
 
-  <Suspense\> works upon Context as well as the same with <ErrorBoundary\>. When any async request from outside completes, then get and invoke the function of showing children of `Suspense` component from the nearest owner which is created by `Suspense` component.
+  <Suspense\> works upon Context as well as the same with <ErrorBoundary\>. When any async request to outside completes, then get and invoke the function of showing children of `Suspense` component from the nearest owner which is created by `Suspense` component.
 
   But `Suspense` collects all status of async requests, Only when all of them are resolved, children elements show. One approach is counting the number of pending requests, it decreases as long as they are resolved till that number is zero that's the time of showing children.
 
