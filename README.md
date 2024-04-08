@@ -2,23 +2,29 @@
 
 Explore how solid works behind the scenes.
 
-## Destructure
+## Structure
+**Reaction propgration**
+![](./reaction-wave.svg)
 
+**Context in owner tree**
+![](./solid-context.svg)
+
+## Tasks
 - Reactivity
 
-  - ✅ createSignal
-  - ✅ createEffect
-  - ✅ createMemo
-  - ✅ untrack
-  - ✅ root
-  - ✅ onCleanup
+  - ~~createSignal~~
+  - ~~createEffect~~
+  - ~~createMemo~~
+  - ~~untrack~~
+  - ~~root~~
+  - ~~onCleanup~~
   - batch
 
 - Rendering
-  - ✅ createComponent
-  - ✅ dynamicPropery(convert the access of prop from invoking to the way of property access).
-  - ✅ insert (link child nodes to parent node)
-  - ✅ assign (static attributes)
+  - ~~createComponent~~
+  - ~~dynamicPropery(convert the access of prop from invoking to the way of property access)~~.
+  - ~~insert (link child nodes to parent node)~~
+  - ~~assign (static attributes)~~
 
 ## Q&A
 
@@ -116,7 +122,7 @@ Explore how solid works behind the scenes.
 
   Instead, component tree is built depending on the clear UI semantic defined by user.
 
-  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what React has done. So reactive mode of React is just the special case of fine-grained reative. 
+  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what React has done. So reactive mode of React is just the special case of fine-grained reative.
 
 - How does the context implement?
 
@@ -124,11 +130,12 @@ Explore how solid works behind the scenes.
 
 - What do internal functions as `runTop` and `lookUpstream` ready do?
 
-  Reaction happends like propagation from center point(Signal) to computation edges. but if adopting a way like invoking observers on every computation owner, then couldn't ensure the update order which is based on dependencies. There are two types of dependencies, subscription between computation and parent-child computation. So first it has to find out the root computation(marked as stale) which is the start point of this update path depending on dependency trace, and then run it to tirgger the whole update chain. other computations in the update chain that are derived nodes are marked as pending. 
+  Reaction happends like propagation from center point(Signal) to computation edges. but if adopting a way like invoking observers on every computation owner, then couldn't ensure the update order which is based on dependencies. There are two types of dependencies, subscription between computation and parent-child computation. So first it has to find out the root computation(marked as stale) which is the start point of this update path depending on dependency trace, and then run it to tirgger the whole update chain. other computations in the update chain that are derived nodes are marked as pending.
 
   When running the root computation, it must find out all ancestor computations through parent-child computation dependencies, and then run them from top to bottom invoking order to reevaluate all computations.
 
   Subscription between computation is created by `createMemo` in general, as below
+
   ```js
     [a1, setA1] = createSignal(false),
     b1 = createMemo(
@@ -148,26 +155,27 @@ Explore how solid works behind the scenes.
   ```
 
   Parent-child computation is created by nested invokation of `createMemo` or `createEffect`
+
   ```js
-    createRoot(() => {
-      const [s1, set1] = createSignal(1);
-      const [s2, set2] = createSignal(2);
-      let c1: () => number;
-      createEffect(() => {
-        const value = s2() + 3
-        createMemo(() => {
-          c1 = createMemo(() => s1());
-          return c1 + value
-        }); 
-      })  
-    });
+  createRoot(() => {
+    const [s1, set1] = createSignal(1)
+    const [s2, set2] = createSignal(2)
+    let c1: () => number
+    createEffect(() => {
+      const value = s2() + 3
+      createMemo(() => {
+        c1 = createMemo(() => s1())
+        return c1 + value
+      })
+    })
+  })
   ```
 
 - What is transition? what problem does it solve? how to implement it?
 
   what transition does is that waiting all promises are resolved, then submit all commits. so transition need to collect all promises, and run computation map in a temporary template as well, hydrate back to the real computation map once all promises finish.
-  
-  but we couldn't always wait those promises finished, so async reschedule should be involved to avoid blocking the main thread. 
+
+  but we couldn't always wait those promises finished, so async reschedule should be involved to avoid blocking the main thread.
 
 - How about <Suspense\>, lazy, createResource?
 
@@ -179,12 +187,20 @@ Explore how solid works behind the scenes.
   So the whole reactive track path is generated, once component is resolved and set component into signal, this will trigger the subsequential track path, ending with appending that component into DOM tree.
 
 - CatchError and <ErrorBoundary\>
-  
+
   `ErrorBoundary` is a declarative expression to define the way of error handler, however `catchError` is a imperative way. ErrorBoundary is implemented based on the context, where there is a built-in specific context called something like ErrorContext which puts the function of showing error view in the nearest owner that's newly created by `ErrorBoundary`. When any error happends under that owner scope, getting that function from nearest owner and invoke it to show error view.
 
   What the function of showing error view looks like is that appending elemens associated with error view into the root element to replace children of `ErrorBoundary` component.
 
   `catchError` offers a imperative way to set error handler into the error context upstream. Use case of it is like that report error to server side. `ErrorBoundary` is generally used to provide a view for error case on client side.
+
+- Why giving up component tree instead of applying owner tree?
+
+  Build owner tree based on reactive execution path and after-execution cleanup path which is from pragmatic perspective of framework at a low level, keeping it agnostic for the upper level is a good design principle. That means a pure reactive system should keep it simple and pure, don't let concepts or semantic from user penetrate in. By this way, this type of reactive system is independent and better to reuse in more cases.
+
+  Instead, component tree is built depending on the clear UI semantic defined by user.
+
+  Assuming that each signal in one component changes trigger the whole component rerun considering the component as a computation, then this mental mode is what react has done.
 
 ## Reference
 
@@ -197,3 +213,7 @@ Explore how solid works behind the scenes.
 - [mobx-jsx](https://github.com/ryansolid/mobx-jsx/blob/master/src/lib.ts)
 
 - [solid](https://github.com/solidjs/solid)
+
+- [dom-expressions](https://github.com/ryansolid/dom-expressions)
+
+- [S.js](https://github.com/adamhaile/S)
