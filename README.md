@@ -76,7 +76,7 @@ Explore how solid works behind the scenes.
   - Library like Svelte, compiling each component into basically 2 functions. A create path and an update path. So on create it runs the initial code. But whenever the reactive system triggers it runs the update path instead.
   - As solid which only comple jsx but not component, what it does is to exclude component recreate dom in update phase.
 
-  What we are able to do is including a new API called untrack to solve this issue mentioned above that's what the `createComponent` API does, inside which, `untrack` is called to wrap component function to make it escape the tracking scope.
+  What we are able to do is including a new API called untrack to solve this issue mentioned above that's what the `createComponent` API does, inside which, `untrack` is called to wrap component function to make it escape the tracking scope. In the above example, don't let the change of`name` signal to cause the whole recreation of `Greeting` component.
 
   Reference to `Reactive Isolation` section of this blog [SolidJS: Reactivity to Rendering](https://angularindepth.com/posts/1289/solidjs-reactivity-to-rendering)
 
